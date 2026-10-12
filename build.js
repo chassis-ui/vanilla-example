@@ -5,12 +5,13 @@
  * dist/ holds:
  * - everything in src/, the same files for every brand
  * - vendor/css/: Chassis CSS, compiled from its Sass source with the design tokens of the brand
- * - vendor/fonts/: the font stylesheets of the brand, with the font files and the licenses
- * - vendor/images/logo/: the logo of the brand
+ * - vendor/js/: the Chassis JavaScript bundle, with the libraries its plugins use
+ * - vendor/assets/: the folder that chassis-assets builds for the brand, as a whole: the
+ *   fonts with their stylesheets and licenses in fonts/, the logos in images/logo/
  * - vendor/icons/: the Chassis Icons font stylesheet and the font files it references
  *
- * The fonts and the logo come from chassis-assets, the `vendor/assets` submodule, which
- * `pnpm vendor` prepares. Paths are resolved from this file, not the working directory.
+ * chassis-assets is the `vendor/assets` submodule, which `pnpm vendor` prepares. Paths are
+ * resolved from this file, not the working directory.
  */
 
 import { execFileSync } from 'node:child_process'
@@ -34,11 +35,11 @@ import * as sass from 'sass'
 import { ASSETS_FILES, ASSETS_PATH, assetsCli, assetsRepo } from './assets.js'
 
 const DEFAULT_BRAND = 'chassis'
-const FONT_ROLES = ['text', 'display', 'code']
 // The characters the fonts keep, each range in a file of its own: the languages that are
 // written in Latin letters
 const FONT_RANGES = ['latin', 'latin-ext']
-const LOGO = 'images/logo/chassis-icon-brand.svg'
+// The JavaScript of Chassis CSS as one ES module, and the source map it names
+const SCRIPTS = ['chassis.bundle.min.js', 'chassis.bundle.min.js.map']
 
 const root = import.meta.dirname
 const src = join(root, 'src')
@@ -113,9 +114,9 @@ function copyStylesheet(from, to) {
   }
 }
 
-// Builds the fonts and the logo of the brand with chassis-assets, into a folder that is
-// removed at the end. The build writes <out>/web/docs/<brand>/. The package that subsets
-// the fonts is installed in the submodule by `pnpm vendor`.
+// Builds the assets of the brand with chassis-assets, into a folder that is removed at the
+// end. The build writes <out>/web/docs/<brand>/. The package that subsets the fonts is
+// installed in the submodule by `pnpm vendor`.
 function buildAssets(out) {
   const args = ['build', '--cwd', assetsRepo, '--out', out, '--quiet']
   args.push('--brand', brand, ...ASSETS_FILES)
@@ -168,12 +169,22 @@ try {
   mkdirSync(join(dist, 'vendor/css'), { recursive: true })
   writeFileSync(join(dist, 'vendor/css/chassis.min.css'), await compileCss())
 
-  for (const role of FONT_ROLES) {
-    copyStylesheet(join(assets, `fonts/${role}.css`), join(dist, `vendor/fonts/${role}.css`))
-    copy(join(assets, `fonts/${role}-license.txt`), join(dist, `vendor/fonts/${role}-license.txt`))
+  for (const script of SCRIPTS) {
+    copy(join(cssDir, 'dist/js', script), join(dist, 'vendor/js', script))
   }
 
-  copy(join(assets, LOGO), join(dist, 'vendor', LOGO))
+  // The assets of the brand: the whole folder, not a list of files.
+  //
+  // chassis-assets builds one folder per platform, app and brand, `web/docs/<brand>/` here,
+  // and every brand has the same file names and the same paths in it. That folder is what a
+  // project takes from chassis-assets. Copied as it is, the page links
+  // `vendor/assets/fonts/text.css` or `vendor/assets/images/logo/chassis-icon-brand.svg`
+  // whatever the brand, and a file that chassis-assets adds, renames or removes needs no
+  // change in this script: only the page that links it changes.
+  //
+  // What the folder holds is decided where chassis-assets is asked for it, by ASSETS_FILES
+  // of assets.js. This script names no font and no image.
+  copy(assets, join(dist, 'vendor/assets'))
 
   copyStylesheet(
     join(iconsDir, 'chassis-icons.min.css'),

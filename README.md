@@ -17,14 +17,21 @@ This repository is deployed as two websites, from the same commit:
 | [example-1.chassis-ui.com](https://example-1.chassis-ui.com) | `chassis` |
 | [example-2.chassis-ui.com](https://example-2.chassis-ui.com) | `sinefil` |
 
-The page shows:
+The page has six sections, and a sticky header that follows them:
 
-- context classes that re-color a card and its content
-- a contact form built from form fields, with a small script that shows a sent
-  state
-- button and badge sizes and styles
-- icon font glyphs in buttons and cards
-- the fonts and the logo of the brand
+- a header with a segmented navigation that marks the section in view and
+  moves the links that do not fit into a menu, and a theme menu for light, dark
+  and the default, which follows the system
+- features, with the fonts and the corner radii of the build, read from the
+  page itself
+- pricing, with cards, a monthly and yearly switch and a comparison table
+- a dashboard, with a filtered table, a menu on each row, a drawer, a modal and
+  an alert
+- a contact form, with a combobox, a datepicker and a chip input, and a toast
+  when it is sent
+- questions about the page, in an accordion
+
+The data is made up, and nothing that is typed leaves the page.
 
 ## Build
 
@@ -39,7 +46,15 @@ pnpm vendor
 pnpm build
 ```
 
-Then open `dist/index.html` in a browser.
+Then serve `dist/` with a static file server and open the address it prints:
+
+```sh
+pnpm dlx serve dist
+```
+
+The page loads its scripts as ES modules, which a browser does not load from a
+file on the disk: `dist/index.html` opened as a file is styled, and its menus
+and dialogs do not open.
 
 | Command        | What it does                                                                 |
 | -------------- | ---------------------------------------------------------------------------- |
@@ -82,12 +97,12 @@ BRAND=acme: @chassis-ui/tokens has no brand 'acme'. It has 'chassis', 'sinefil'.
 The source of the page is in `src/`. `build.js` copies it to `dist/`, together
 with the files of the brand:
 
-| Folder                | Files                                                                               | From                |
-| --------------------- | ----------------------------------------------------------------------------------- | ------------------- |
-| `vendor/css/`         | Chassis CSS, compiled from its Sass source with the tokens of the brand             | `@chassis-ui/css`   |
-| `vendor/fonts/`       | `text.css`, `display.css` and `code.css`, the font files they load and the licenses | chassis-assets      |
-| `vendor/images/logo/` | The logo of the brand                                                               | chassis-assets      |
-| `vendor/icons/`       | The icon font stylesheet and its font files                                         | `@chassis-ui/icons` |
+| Folder           | Files                                                                              | From                |
+| ---------------- | ---------------------------------------------------------------------------------- | ------------------- |
+| `vendor/css/`    | Chassis CSS, compiled from its Sass source with the tokens of the brand            | `@chassis-ui/css`   |
+| `vendor/js/`     | `chassis.bundle.min.js`, the Chassis JavaScript as one ES module, and its map      | `@chassis-ui/css`   |
+| `vendor/assets/` | The folder of the brand, as a whole: the fonts in `fonts/`, the logos in `images/` | chassis-assets      |
+| `vendor/icons/`  | The icon font stylesheet and its font files                                        | `@chassis-ui/icons` |
 
 ### The CSS of a brand
 
@@ -111,6 +126,22 @@ A project with one brand needs no importer. It has a `_chassis-tokens.scss` on
 its Sass load paths, which forwards the tokens of its brand. The importer is
 here because the brand of this build is decided when the build runs.
 
+### The scripts of the page
+
+The page loads three scripts, all files of the site:
+
+- `theme.js` sets the theme that the visitor chose, and runs the theme menu.
+  It is loaded without `defer`, so the theme is set before the first paint.
+  Chassis CSS reads the theme from the `data-cx-theme` attribute of `<html>`:
+  `light`, `dark`, or no attribute for the system preference.
+- `vendor/js/chassis.bundle.min.js` is the JavaScript of Chassis CSS, with the
+  two libraries its plugins use. It is the same file for every brand. The
+  components start from their `data-cx-*` attributes, and the page has no code
+  for them.
+- `script.js` is what the page adds: the toast of the demos, the switches of
+  the prices and of the period, the filter and the rows of the table, and the
+  mark of the section navigation when its links are in the menu.
+
 ### Assets
 
 The fonts and the logos are in
@@ -126,14 +157,26 @@ its `app/docs` branch. Its fonts are Git LFS files.
 3. installs the package of the chassis-assets build inside the submodule, which
    holds the package that subsets a font
 
-`build.js` then runs the build of chassis-assets for the brand, with the fonts
-and the logo only. The fonts keep the characters of the languages that are
+`build.js` then runs the build of chassis-assets for the brand, and copies the
+folder it writes, `web/docs/<brand>/`, to `dist/vendor/assets/` as a whole. That
+folder is how a project takes its assets from chassis-assets: every brand has
+the same file names and the same paths in it, so the build names no font and no
+image, and a file that chassis-assets adds or renames needs no change in
+`build.js`. The folder holds more than the page links, such as the fonts of each
+weight beside the variable fonts.
+
+`ASSETS_FILES` of `assets.js` says what the build asks for: the `docs` app, the
+web, and of the app the fonts and the logos. Without its `--include` option the
+folder holds every asset of the app, and `pnpm vendor` pulls many times more
+from Git LFS.
+
+The fonts keep the characters of the languages that are
 written in Latin letters, in a file per range, such as `text-latin.woff2` and
 `text-latin-ext.woff2`. A browser loads the file of a range when the page has a
 character of it.
 
-`assets.js` holds what the two scripts share: the path of the submodule and the
-files that the example takes from it.
+`assets.js` holds what the two scripts share: the path of the submodule and what
+the example asks it for.
 
 To move the submodule to the latest commit of `app/docs`:
 
@@ -191,7 +234,10 @@ variable, and in their domain.
   examples, and search engines do not index them
 - a `Content-Security-Policy` header that allows the files of the site itself
   and nothing else. The one exception is `data:` images, which Chassis CSS uses
-  for the small icons of its components, such as the arrow of a select field
+  for the small icons of its components, such as the arrow of a select field.
+  The policy refuses an inline script, a `<style>` element and a `style`
+  attribute in the HTML. The Chassis JavaScript places a menu or a calendar
+  through the style property of the element, which the policy allows
 
 ### Project settings
 
@@ -233,7 +279,7 @@ generates for a deployment ask for a Vercel login.
 ## Repository layout
 
 ```
-src/              The page: index.html, script.js and styles.css
+src/              The page: index.html, theme.js, script.js and styles.css
 build.js          Builds dist/ for the brand that BRAND names
 vendor.js         Prepares the vendor/assets submodule
 assets.js         What the two scripts share about chassis-assets
