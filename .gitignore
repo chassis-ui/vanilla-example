@@ -147,3 +147,15 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# OS
+._*
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.claude
+
+# deploy
+.vercel

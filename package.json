@@ -1,0 +1,43 @@
+{
+  "name": "chassis-vanilla-example",
+  "description": "Chassis CSS and Chassis Icons in a plain HTML page, built for one brand at a time",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chassis-ui/vanilla-example.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chassis-ui/vanilla-example/issues"
+  },
+  "homepage": "https://chassis-ui.com",
+  "author": "Ozgur Gunes <o.gunes@gmail.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "vendor": "node vendor.js",
+    "build": "node build.js",
+    "lint": "pnpm lint:eslint && pnpm lint:prettier",
+    "lint:eslint": "eslint --cache --cache-location .cache/.eslintcache --report-unused-disable-directives .",
+    "lint:prettier": "prettier -c --cache .",
+    "format": "prettier --write --cache ."
+  },
+  "devDependencies": {
+    "@chassis-ui/css": "^0.7.1",
+    "@chassis-ui/icons": "^0.3.1",
+    "@chassis-ui/tokens": "^0.7.0",
+    "@eslint/js": "^10.0.1",
+    "autoprefixer": "^10.6.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "globals": "^17.13.0",
+    "postcss": "^8.5.28",
+    "postcss-prefix-custom-properties": "^0.1.0",
+    "prettier": "^3.9.9",
+    "sass": "^1.105.1"
+  },
+  "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
+}

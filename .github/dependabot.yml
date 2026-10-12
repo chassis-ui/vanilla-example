@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    # Dependabot waits 3 days after a release by default, and passes that on to pnpm as its
+    # minimum release age when it re-resolves the lockfile, so a Chassis package that this
+    # repository already requires fails the whole run until it is 3 days old. Chassis
+    # releases can be urgent fixes between our own packages: they are exempt here, and from
+    # pnpm's check in pnpm-workspace.yaml. Everything else keeps the default.
+    cooldown:
+      default-days: 3
+      exclude:
+        - '@chassis-ui/*'
+    commit-message:
+      prefix: 'chore(deps)'
+    groups:
+      # A dependency goes into the first group that matches it.
+      # The Chassis packages move together, and change what the page looks like.
+      chassis:
+        patterns: ['@chassis-ui/*']
+      # Minor and patch updates of the rest of the tooling in one pull request.
+      # Major updates get a pull request each.
+      dev-dependencies:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: 'ci'
+    groups:
+      actions:
+        patterns: ['*']

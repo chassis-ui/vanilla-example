@@ -1,0 +1,10 @@
+# Our own packages install at any age. Dependabot hands its 3-day cooldown to pnpm as a minimum
+# release age when it re-resolves the lockfile, which rejects a Chassis release that this
+# repository already requires. See the cooldown in .github/dependabot.yml, which exempts the
+# same packages.
+minimumReleaseAgeExclude:
+  - '@chassis-ui/*'
+
+# An optional package of Sass for `sass --watch`, which the build does not use
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
