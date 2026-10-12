@@ -171,10 +171,18 @@ describes.
 ## Deployment
 
 Each brand is a project of its own on [Vercel](https://vercel.com). Every project
-is connected to this repository and deploys the same commit. The projects differ
-in one setting, the `BRAND` environment variable, and in their domain.
+is connected to this repository, and a push to `main` deploys all of them from
+the same commit. The projects differ in one setting, the `BRAND` environment
+variable, and in their domain.
 
-`vercel.json` holds what the projects share:
+| Vercel project      | `BRAND`   | Domain                     | Address on Vercel              |
+| ------------------- | --------- | -------------------------- | ------------------------------ |
+| `chassis-example-1` | `chassis` | `example-1.chassis-ui.com` | `chassis-example-1.vercel.app` |
+| `chassis-example-2` | `sinefil` | `example-2.chassis-ui.com` | `chassis-example-2.vercel.app` |
+
+### What the projects share
+
+`vercel.json` holds the build and the headers, so no project overrides them:
 
 - the commands: `pnpm install --frozen-lockfile`, then
   `pnpm vendor && pnpm build`
@@ -185,9 +193,42 @@ in one setting, the `BRAND` environment variable, and in their domain.
   and nothing else. The one exception is `data:` images, which Chassis CSS uses
   for the small icons of its components, such as the arrow of a select field
 
-To deploy another brand, create a Vercel project from this repository, set
-`BRAND` to the name of the brand for every environment of the project, and add
-the domain.
+### Project settings
+
+Every project has the same settings on Vercel, except for the value of `BRAND`:
+
+| Setting                   | Value                                                     |
+| ------------------------- | --------------------------------------------------------- |
+| Git repository            | `chassis-ui/vanilla-example`, with `main` as the branch   |
+| Root Directory            | `./`, the root of the repository                          |
+| Application Preset        | Other                                                     |
+| Build and Output Settings | No override: the commands and the folder of `vercel.json` |
+| Environment Variables     | `BRAND`, the name of the brand                            |
+| Node.js Version           | 24.x                                                      |
+| Git LFS                   | Enabled                                                   |
+
+The submodule needs no setting. chassis-assets is a public repository, and
+`pnpm vendor` checks it out at the pinned commit and pulls its fonts from Git LFS
+while the site is built.
+
+Each domain is a `CNAME` record in the DNS of `chassis-ui.com`, named after the
+subdomain, such as `example-1`. Its value is the one that Vercel shows for the
+domain of the project, and it differs between projects.
+
+The addresses of the table above are public. The other addresses that Vercel
+generates for a deployment ask for a Vercel login.
+
+### Deploying another brand
+
+1. Create a Vercel project from this repository, with the settings of the table
+   above. Vercel accepts several projects for one repository.
+2. Set `BRAND` to the name of the brand, before the first deployment.
+3. Deploy, then set the Node.js version and enable Git LFS in the settings of
+   the project. They apply from the next deployment.
+4. Add the domain to the project, and its `CNAME` record to the DNS of
+   `chassis-ui.com`.
+5. Add the project to the table of this section, and the site to the table at
+   the top of this file.
 
 ## Repository layout
 
