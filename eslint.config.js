@@ -6,7 +6,7 @@ import prettierPlugin from 'eslint-plugin-prettier/recommended'
 export default defineConfig([
   // Global ignores
   {
-    ignores: ['dist/', '.cache/', 'vendor/']
+    ignores: ['dist/', '.cache/']
   },
   eslint.configs.recommended,
   prettierPlugin,

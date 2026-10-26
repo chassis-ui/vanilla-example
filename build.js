@@ -2,52 +2,56 @@
  * Builds the example into dist/ for one brand: the brand that the BRAND environment
  * variable names, or `chassis` without it.
  *
- * dist/ holds:
- * - everything in src/, the same files for every brand
- * - vendor/css/: Chassis CSS, compiled from its Sass source with the design tokens of the brand
- * - vendor/js/: the Chassis JavaScript bundle, with the libraries its plugins use
- * - vendor/assets/: the folder that chassis-assets builds for the brand, as a whole: the
- *   fonts with their stylesheets and licenses in fonts/, the logos in images/logo/
- * - vendor/icons/: the Chassis Icons font stylesheet and the font files it references
+ * dist/ holds index.html, and every other file under assets/:
+ * - everything in src/, the same files for every brand: the page's own css/ and js/
+ * - css/: Chassis CSS, compiled from its Sass source with the design tokens of the brand
+ * - js/: the Chassis JavaScript bundle, with the libraries its plugins use
+ * - icons/: the Chassis Icons font stylesheet and the font files it references
+ * - the archive of the brand from a release of chassis-assets, as a whole: the fonts with
+ *   their stylesheet and licenses in fonts/, the logos in images/, and the rest of its
+ *   folders. A file of the archive that the build writes too fails the build
  *
- * chassis-assets is the `vendor/assets` submodule, which `pnpm vendor` prepares. Paths are
- * resolved from this file, not the working directory.
+ * The archive is downloaded once into .cache/assets/ and checked against the SHA-256 that
+ * GitHub publishes for it. Paths are resolved from this file, not the working directory.
  */
 
-import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import {
   cpSync,
   existsSync,
   mkdirSync,
-  mkdtempSync,
   readdirSync,
   readFileSync,
   rmSync,
   writeFileSync
 } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { dirname, join } from 'node:path'
+import { dirname, join, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { chassisPostcss } from '@chassis-ui/css/postcss'
 import autoprefixer from 'autoprefixer'
+import { unzipSync } from 'fflate'
 import postcss from 'postcss'
 import * as sass from 'sass'
-import { ASSETS_FILES, ASSETS_PATH, assetsCli, assetsRepo } from './assets.js'
 
 const DEFAULT_BRAND = 'chassis'
-// The characters the fonts keep, each range in a file of its own: the languages that are
-// written in Latin letters
-const FONT_RANGES = ['latin', 'latin-ext']
+// The release of chassis-assets that the fonts and the logos come from
+const ASSETS_VERSION = '0.5.0'
+const ASSETS_RELEASE = `https://api.github.com/repos/chassis-ui/assets/releases/tags/v${ASSETS_VERSION}`
+// The folders of an archive that the page has no use for: the design exports of the docs app,
+// most of its size
+const ASSETS_SKIP = ['images/figma/', 'images/home/']
 // The JavaScript of Chassis CSS as one ES module, and the source map it names
 const SCRIPTS = ['chassis.bundle.min.js', 'chassis.bundle.min.js.map']
 
 const root = import.meta.dirname
 const src = join(root, 'src')
 const dist = join(root, 'dist')
+const assets = join(dist, 'assets')
 const modules = join(root, 'node_modules')
 const cssDir = join(modules, '@chassis-ui/css')
 const tokensDir = join(modules, '@chassis-ui/tokens/dist/web/docs')
 const iconsDir = join(modules, '@chassis-ui/icons/icons')
+const assetsCache = join(root, '.cache/assets', `v${ASSETS_VERSION}`)
 
 function fail(message) {
   console.error(message)
@@ -72,27 +76,58 @@ function tokensBrands() {
     .map((entry) => entry.name)
 }
 
-// The brands of chassis-assets: `chassis.build.brands` of its package.json
-function assetsBrands() {
-  if (!existsSync(assetsCli)) {
-    fail(`Missing source: ${assetsCli}\nRun \`pnpm vendor\`.`)
+// The archives of the release, one per platform, app and brand. The page takes the web
+// archive of the `docs` app: chassis-assets-web-docs-<brand>-<version>.zip. Returns, by
+// brand, its name, its download address and its SHA-256, from .cache/assets/ when an
+// earlier build asked GitHub for them already.
+async function assetsArchives() {
+  const cached = join(assetsCache, 'release.json')
+
+  if (existsSync(cached)) {
+    return JSON.parse(readFileSync(cached, 'utf8'))
   }
 
-  const manifest = JSON.parse(readFileSync(join(assetsRepo, 'package.json'), 'utf8'))
+  // A token raises the limit of the GitHub API, 60 requests an hour without one
+  const token = process.env.GITHUB_TOKEN
+  const response = await fetch(ASSETS_RELEASE, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      ...(token && { Authorization: `Bearer ${token}` })
+    }
+  }).catch((error) => fail(`${ASSETS_RELEASE}: ${error.message}`))
 
-  return manifest.chassis?.build?.brands ?? []
+  if (!response.ok) {
+    fail(`${ASSETS_RELEASE}: HTTP ${response.status}`)
+  }
+
+  const prefix = 'chassis-assets-web-docs-'
+  const suffix = `-${ASSETS_VERSION}.zip`
+  const archives = {}
+
+  for (const { name, browser_download_url: url, digest } of (await response.json()).assets) {
+    if (name.startsWith(prefix) && name.endsWith(suffix)) {
+      archives[name.slice(prefix.length, -suffix.length)] = { name, url, digest }
+    }
+  }
+
+  mkdirSync(assetsCache, { recursive: true })
+  writeFileSync(cached, `${JSON.stringify(archives, null, 2)}\n`)
+
+  return archives
 }
 
-function checkBrand() {
+function checkBrand(archives) {
   const tokens = tokensBrands()
-  const assets = assetsBrands()
+  const assets = Object.keys(archives)
 
   if (!tokens.includes(brand)) {
     fail(`BRAND=${brand}: @chassis-ui/tokens has no brand '${brand}'. It has ${list(tokens)}.`)
   }
 
   if (!assets.includes(brand)) {
-    fail(`BRAND=${brand}: chassis-assets has no brand '${brand}'. It has ${list(assets)}.`)
+    fail(
+      `BRAND=${brand}: chassis-assets ${ASSETS_VERSION} has no brand '${brand}'. It has ${list(assets)}.`
+    )
   }
 }
 
@@ -114,18 +149,59 @@ function copyStylesheet(from, to) {
   }
 }
 
-// Builds the assets of the brand with chassis-assets, into a folder that is removed at the
-// end. The build writes <out>/web/docs/<brand>/. The package that subsets the fonts is
-// installed in the submodule by `pnpm vendor`.
-function buildAssets(out) {
-  const args = ['build', '--cwd', assetsRepo, '--out', out, '--quiet']
-  args.push('--brand', brand, ...ASSETS_FILES)
-  args.push('--subset', ...FONT_RANGES, '--split')
+// The archive of the brand, from the cache or downloaded into it, and checked either way
+// against the SHA-256 of the release
+async function assetsArchive({ name, url, digest }) {
+  const cached = join(assetsCache, name)
+  let data
 
-  try {
-    execFileSync(process.execPath, [assetsCli, ...args], { stdio: 'inherit' })
-  } catch {
-    fail(`The build of ${ASSETS_PATH} failed. Run \`pnpm vendor\`.`)
+  if (existsSync(cached)) {
+    data = readFileSync(cached)
+  } else {
+    const response = await fetch(url).catch((error) => fail(`${url}: ${error.message}`))
+
+    if (!response.ok) {
+      fail(`${url}: HTTP ${response.status}`)
+    }
+
+    data = Buffer.from(await response.arrayBuffer())
+  }
+
+  const sha256 = `sha256:${createHash('sha256').update(data).digest('hex')}`
+
+  if (sha256 !== digest) {
+    fail(
+      `${name}: the SHA-256 is ${sha256}, and the release has ${digest}.\nRemove ${assetsCache}.`
+    )
+  }
+
+  if (!existsSync(cached)) {
+    writeFileSync(cached, data)
+  }
+
+  return data
+}
+
+// Writes the files of an archive into a folder, but those of ASSETS_SKIP. A file that is
+// there already fails, rather than replace a file of the build.
+function unpack(data, to) {
+  const files = unzipSync(data, {
+    filter: ({ name }) => !name.endsWith('/') && !ASSETS_SKIP.some((skip) => name.startsWith(skip))
+  })
+
+  for (const [name, content] of Object.entries(files)) {
+    const file = join(to, name)
+
+    if (!file.startsWith(to + sep)) {
+      fail(`The archive has a file outside its folder: ${name}`)
+    }
+    mkdirSync(dirname(file), { recursive: true })
+    try {
+      writeFileSync(file, content, { flag: 'wx' })
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error
+      fail(`The archive has ${name}, which the build writes too.`)
+    }
   }
 }
 
@@ -153,45 +229,36 @@ async function compileCss() {
   return result.css
 }
 
-checkBrand()
+const archives = await assetsArchives()
+
+checkBrand(archives)
+
+const archive = await assetsArchive(archives[brand])
 
 rmSync(dist, { recursive: true, force: true })
 
-const assetsOut = mkdtempSync(join(tmpdir(), 'chassis-example-'))
+copy(src, dist)
 
-try {
-  buildAssets(assetsOut)
+mkdirSync(join(assets, 'css'), { recursive: true })
+writeFileSync(join(assets, 'css/chassis.min.css'), await compileCss())
 
-  const assets = join(assetsOut, 'web/docs', brand)
-
-  copy(src, dist)
-
-  mkdirSync(join(dist, 'vendor/css'), { recursive: true })
-  writeFileSync(join(dist, 'vendor/css/chassis.min.css'), await compileCss())
-
-  for (const script of SCRIPTS) {
-    copy(join(cssDir, 'dist/js', script), join(dist, 'vendor/js', script))
-  }
-
-  // The assets of the brand: the whole folder, not a list of files.
-  //
-  // chassis-assets builds one folder per platform, app and brand, `web/docs/<brand>/` here,
-  // and every brand has the same file names and the same paths in it. That folder is what a
-  // project takes from chassis-assets. Copied as it is, the page links
-  // `vendor/assets/fonts/text.css` or `vendor/assets/images/logo/chassis-icon-brand.svg`
-  // whatever the brand, and a file that chassis-assets adds, renames or removes needs no
-  // change in this script: only the page that links it changes.
-  //
-  // What the folder holds is decided where chassis-assets is asked for it, by ASSETS_FILES
-  // of assets.js. This script names no font and no image.
-  copy(assets, join(dist, 'vendor/assets'))
-
-  copyStylesheet(
-    join(iconsDir, 'chassis-icons.min.css'),
-    join(dist, 'vendor/icons/chassis-icons.min.css')
-  )
-
-  console.log(`Built ${dist} for the brand '${brand}'`)
-} finally {
-  rmSync(assetsOut, { recursive: true, force: true })
+for (const script of SCRIPTS) {
+  copy(join(cssDir, 'dist/js', script), join(assets, 'js', script))
 }
+
+copyStylesheet(join(iconsDir, 'chassis-icons.min.css'), join(assets, 'icons/chassis-icons.min.css'))
+
+// The assets of the brand: the whole archive, not a list of files.
+//
+// chassis-assets releases one archive per platform, app and brand, and every brand has the
+// same file names and the same paths in it. That archive is what a project takes from
+// chassis-assets. Unpacked as it is, the page links `assets/fonts/fonts.css` or
+// `assets/images/favicon.svg` whatever the brand, and a file that chassis-assets adds,
+// renames or removes needs no change in this script: only the page that links it changes.
+//
+// The folders the page has no use for are left out by ASSETS_SKIP. This script names no
+// font and no image. The archive goes last, beside the files above, so that a file it has
+// as well fails the build instead of replacing one of them.
+unpack(archive, assets)
+
+console.log(`Built ${dist} for the brand '${brand}' with chassis-assets ${ASSETS_VERSION}`)

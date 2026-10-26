@@ -55,8 +55,6 @@ jobs:
         brand: [chassis, sinefil]
 
     steps:
-      # Without the submodule: `pnpm vendor` checks out vendor/assets at the commit pinned
-      # in this repository, with the Git LFS files of the build only
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -74,10 +72,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Vendor assets
-        run: pnpm vendor
-
+      # The token raises the limit of the GitHub API, which the build asks for the archives of
+      # the chassis-assets release
       - name: Build
         run: pnpm build
         env:
           BRAND: ${{ matrix.brand }}
+          GITHUB_TOKEN: ${{ github.token }}

@@ -1,0 +1,70 @@
+/* What the page needs and no Chassis class does. The rules are in the `custom` cascade layer
+   of Chassis CSS, which comes before its `utilities` layer: a utility class such as `d-none`
+   wins over a rule of this file, whatever their selectors.
+   https://developer.mozilla.org/en-US/docs/Web/CSS/@layer */
+
+@layer custom {
+  /* A link of the section navigation scrolls its section to below the sticky header. This is a
+     margin of the sections, not `scroll-padding-top` on <html>: the padding applies to every
+     element that the browser scrolls into view, the focused one too. A menu focuses its toggle
+     when it opens, and a toggle of the sticky header is always inside the padding, so the page
+     would jump up to bring it out, in browsers whose click does not focus a button already,
+     such as Safari. */
+  main > section[id] {
+    scroll-margin-top: 5rem;
+  }
+
+  /* The header in three columns: the logo, the section navigation and the buttons. The outer
+     two take the same share of the width, so that the navigation is centered, and keep the
+     width of the logo and of the buttons where the page is narrow.
+
+     The usual `1fr auto 1fr` would give the navigation no width: `.nav-overflow` is a size
+     container (`container-type: inline-size`), whose content does not size it, so that
+     NavOverflow can measure which links fit and move the others into its menu.
+     https://developer.mozilla.org/en-US/docs/Web/CSS/container-type
+     https://chassis-ui.com/css/docs/components/nav-overflow/ */
+  .site-header .container {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 4fr) 1fr;
+  }
+
+  /* The section navigation is as wide as its links, not as the space it may fill. */
+  .site-header .nav-segments {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  /* The logo of the theme in use: the theme chosen in the menu (`data-cx-theme` on <html>), or
+     the theme of the system when none is chosen. Chassis CSS selects its colors the same way.
+     Its `dark:` utilities, such as `dark:d-none`, would not do here: they follow the system
+     only, and as utilities they would also override these rules. */
+  .logo-light {
+    display: block;
+  }
+
+  .logo-dark {
+    display: none;
+  }
+
+  [data-cx-theme="dark"] {
+    .logo-light {
+      display: none;
+    }
+
+    .logo-dark {
+      display: block;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-cx-theme="light"]) {
+      .logo-light {
+        display: none;
+      }
+
+      .logo-dark {
+        display: block;
+      }
+    }
+  }
+}

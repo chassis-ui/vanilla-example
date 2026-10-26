@@ -1,8 +1,10 @@
-// What the page adds to the Chassis JavaScript. The components start from their `data-cx-*`
-// attributes, in the bundle the page loads; this file holds the demos, which keep nothing
-// and send nothing.
+// What the page adds to the Chassis JavaScript. The components start by themselves from their
+// `data-cx-*` attributes, in the bundle that the page loads; this file holds the demos, which
+// keep nothing and send nothing. It listens to the events of the components, such as
+// `activate.cx.scrollspy`, which the page of each component in the Chassis CSS documentation
+// lists: https://chassis-ui.com/css/docs/getting-started/javascript/
 
-import { Dialog, Toast } from './vendor/js/chassis.bundle.min.js'
+import { Dialog, Toast } from './chassis.bundle.min.js'
 
 // One toast for every message of the page
 const toast = document.getElementById('toast')
@@ -17,6 +19,8 @@ function notify(title, message) {
 // screen NavOverflow moves the links that do not fit into a menu, as copies it makes again
 // on every resize. ScrollSpy does not follow those copies, so the mark is set here, by the
 // address of the link: on the link, on its copy, and on the toggle of the menu that holds it.
+// `event.relatedTarget` is the link of the section that came into view.
+// https://chassis-ui.com/css/docs/components/scrollspy/
 const sections = document.getElementById('sections')
 
 document.body.addEventListener('activate.cx.scrollspy', (event) => {
@@ -75,7 +79,9 @@ filter.addEventListener('change', () => {
 })
 
 // The drawer and the alert open from the menu of a row, and show the `data-field` texts of
-// that row in their `data-detail` elements
+// that row in their `data-detail` elements. In their `show` event, `event.relatedTarget` is
+// the menu item that opened them, inside the row.
+// https://chassis-ui.com/css/docs/components/drawer/
 let openRow = null
 
 function showRow(event) {

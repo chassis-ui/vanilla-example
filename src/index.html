@@ -9,38 +9,26 @@
       content="A plain HTML page styled with Chassis CSS and Chassis Icons, with no framework or bundler."
     />
     <title>Vanilla HTML example · Chassis</title>
-    <link
-      rel="icon"
-      href="./vendor/assets/images/logo/chassis-icon-brand.svg"
-      type="image/svg+xml"
-    />
-    <script src="./theme.js"></script>
-    <link rel="stylesheet" href="./vendor/assets/fonts/text.css" />
-    <link rel="stylesheet" href="./vendor/assets/fonts/display.css" />
-    <link rel="stylesheet" href="./vendor/assets/fonts/code.css" />
-    <link rel="stylesheet" href="./vendor/css/chassis.min.css" />
-    <link rel="stylesheet" href="./vendor/icons/chassis-icons.min.css" />
-    <link rel="stylesheet" href="./styles.css" />
-    <script type="module" src="./vendor/js/chassis.bundle.min.js"></script>
-    <script type="module" src="./script.js"></script>
+    <link rel="icon" href="./assets/images/favicon.svg" type="image/svg+xml" />
+    <script src="./assets/js/theme.js"></script>
+    <link rel="stylesheet" href="./assets/fonts/fonts.css" />
+    <link rel="stylesheet" href="./assets/css/chassis.min.css" />
+    <link rel="stylesheet" href="./assets/icons/chassis-icons.min.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <script type="module" src="./assets/js/chassis.bundle.min.js"></script>
+    <script type="module" src="./assets/js/script.js"></script>
   </head>
   <body data-cx-spy="scroll" data-cx-target="#sections">
-    <header class="site-header sticky-top bg-main border-bottom">
-      <div class="container d-flex align-items-center gap-md py-sm">
+    <header class="site-header sticky-top bg-main border-bottom border-subtle">
+      <div class="container align-items-center gap-md py-sm">
         <a
-          class="brand d-inline-flex align-items-center gap-xs font-title"
+          class="d-inline-flex align-items-center justify-self-start"
           href="#overview"
           aria-label="Chassis example"
         >
-          <img
-            src="./vendor/assets/images/logo/chassis-icon-brand.svg"
-            alt=""
-            width="44"
-            height="24"
-          />
-          <span class="d-none lg:d-inline">Chassis example</span>
+          <img src="./assets/images/logo/logo-light.svg" alt="" height="24" class="logo-light" />
+          <img src="./assets/images/logo/logo-dark.svg" alt="" height="24" class="logo-dark" />
         </a>
-
         <nav class="nav-overflow" data-cx-toggle="nav-overflow" aria-label="Sections">
           <ul class="nav nav-segments mx-auto" id="sections">
             <li class="nav-item"><a class="nav-link" href="#overview">Overview</a></li>
@@ -52,9 +40,9 @@
           </ul>
         </nav>
 
-        <div class="d-flex align-items-center gap-2xs">
+        <div class="d-flex align-items-center justify-content-end gap-2xs">
           <button
-            class="button default icon-only"
+            class="button default link neutral icon-only"
             type="button"
             data-cx-toggle="menu"
             data-cx-placement="bottom-end"
@@ -81,7 +69,7 @@
             </button>
           </div>
           <a
-            class="button default icon-only"
+            class="button default link neutral icon-only"
             href="https://github.com/chassis-ui/vanilla-example"
             aria-label="Source on GitHub"
           >
@@ -95,14 +83,16 @@
       <section id="overview" class="py-3xl md:py-6xl text-center">
         <div class="container">
           <div class="grid">
-            <div class="col-span-full lg:col-span-8 lg:col-start-3">
-              <h1 class="font-hero mb-md">Vanilla HTML and Chassis CSS</h1>
+            <header class="col-span-full lg:col-span-8 lg:col-start-3 contains-inline">
+              <h1 class="font-hero mb-md">Vanilla HTML &amp; Chassis CSS</h1>
               <p class="font-lead fg-subtle mb-2xl">
                 One HTML file, a few stylesheets and no framework. Every class on this page comes
                 from Chassis CSS and every icon from Chassis Icons. The colors, the fonts, the
                 corners and the logo are those of the brand the page is built for.
               </p>
-              <div class="d-flex flex-wrap justify-content-center gap-sm">
+              <div
+                class="d-flex flex-wrap vstack sm:hstack sm:justify-content-center gap-sm mt-6xl"
+              >
                 <a class="button primary lg" id="hero-action" href="https://chassis-ui.com/css/">
                   <span class="icon cx-book-open-solid" aria-hidden="true"></span>
                   <span>Read the docs</span>
@@ -112,26 +102,26 @@
                   <span>View source</span>
                 </a>
               </div>
-            </div>
+            </header>
           </div>
         </div>
       </section>
 
       <section
         id="features"
-        class="context alternate py-3xl md:py-5xl"
+        class="context alternate py-3xl md:py-6xl"
         aria-labelledby="features-title"
       >
         <div class="container">
-          <div class="text-center mb-2xl">
-            <p class="font-label fg-subtle text-uppercase mb-xs">Features</p>
+          <div class="text-center mb-6xl">
+            <p class="font-label fg-primary text-uppercase mb-xs">Features</p>
             <h2 id="features-title" class="mb-sm">Styled by tokens, not by overrides</h2>
             <p class="font-lead fg-subtle mb-0">
               The same markup takes the look of a brand from its design tokens.
             </p>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-lg">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-6xl">
             <div class="card">
               <div class="card-body">
                 <span class="avatar lg primary smooth mb-md" aria-hidden="true">
@@ -229,14 +219,16 @@
         </div>
       </section>
 
-      <section id="pricing" class="py-3xl md:py-5xl" aria-labelledby="pricing-title">
+      <section id="pricing" class="py-3xl md:py-6xl" aria-labelledby="pricing-title">
         <div class="container">
-          <div class="text-center mb-2xl">
-            <p class="font-label fg-subtle text-uppercase mb-xs">Pricing</p>
-            <h2 id="pricing-title" class="mb-sm">Plans that grow with the team</h2>
-            <p class="font-lead fg-subtle mb-lg">
+          <header class="text-center mb-6xl">
+            <p class="font-label fg-primary text-uppercase mb-xs">Pricing</p>
+            <h2 id="pricing-title" class="mb-xs">Plans that grow with the team</h2>
+            <p class="font-lead fg-subtle">
               Sample plans of a product that does not exist, in cards and in a table.
             </p>
+          </header>
+          <div class="text-center mb-3xl">
             <div
               class="nav nav-segments"
               role="group"
@@ -256,8 +248,7 @@
               </button>
             </div>
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-3xl">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-6xl">
             <div class="card">
               <div class="card-body">
                 <h3 class="card-title">Starter</h3>
@@ -359,8 +350,7 @@
               </div>
             </div>
           </div>
-
-          <div class="table-responsive">
+          <div class="table-responsive position-relative">
             <table class="table hoverable align-middle">
               <caption class="visually-hidden">
                 What each plan includes
@@ -476,15 +466,15 @@
         </div>
       </section>
 
-      <section id="dashboard" class="bg-even py-3xl md:py-5xl" aria-labelledby="dashboard-title">
+      <section id="dashboard" class="bg-even py-3xl md:py-6xl" aria-labelledby="dashboard-title">
         <div class="container">
-          <div class="text-center mb-2xl">
-            <p class="font-label fg-subtle text-uppercase mb-xs">Dashboard</p>
+          <header class="text-center mb-6xl">
+            <p class="font-label fg-primary text-uppercase mb-xs">Dashboard</p>
             <h2 id="dashboard-title" class="mb-sm">A dashboard from the same parts</h2>
             <p class="font-lead fg-subtle mb-0">
               Sample data, with a menu on each row, a drawer, a modal and an alert.
             </p>
-          </div>
+          </header>
 
           <div class="d-flex flex-wrap align-items-center justify-content-between gap-sm mb-lg">
             <div class="nav nav-segments" role="group" aria-label="Period" data-switch="period">
@@ -615,7 +605,7 @@
                 </label>
               </form>
             </div>
-            <div class="table-responsive">
+            <div class="table-responsive position-relative">
               <table class="table hoverable align-middle mb-0" id="projects">
                 <thead>
                   <tr>
@@ -980,15 +970,17 @@
         </div>
       </section>
 
-      <section id="contact" class="py-3xl md:py-5xl" aria-labelledby="contact-title">
+      <section id="contact" class="py-3xl md:py-6xl" aria-labelledby="contact-title">
         <div class="container">
           <div class="grid gap-lg">
             <div class="col-span-full lg:col-span-5">
-              <p class="font-label fg-subtle text-uppercase mb-xs">Contact</p>
-              <h2 id="contact-title" class="mb-sm">Book a demo</h2>
-              <p class="font-lead fg-subtle mb-xl">
-                A form with a combobox, a chip input and a datepicker beside the usual fields.
-              </p>
+              <header class="mb-3xl">
+                <p class="font-label fg-primary text-uppercase mb-xs">Contact</p>
+                <h2 id="contact-title" class="mb-sm">Book a demo</h2>
+                <p class="font-lead fg-subtle mb-xl">
+                  A form with a combobox, a chip input and a datepicker beside the usual fields.
+                </p>
+              </header>
               <ul class="bulletless vstack gap-sm mb-0">
                 <li class="d-flex gap-sm">
                   <span class="icon cx-clock-outline icon-primary" aria-hidden="true"></span>
@@ -1119,9 +1111,6 @@
                     <div class="form-field">
                       <label class="form-label" for="date">Preferred date</label>
                       <div class="form-input">
-                        <span class="input-adorn">
-                          <span class="icon cx-calendar-outline" aria-hidden="true"></span>
-                        </span>
                         <input
                           class="ghost-input"
                           type="text"
@@ -1131,6 +1120,9 @@
                           placeholder="Choose a date…"
                           autocomplete="off"
                         />
+                        <span class="input-adorn">
+                          <span class="icon cx-calendar-outline" aria-hidden="true"></span>
+                        </span>
                       </div>
                     </div>
                     <div class="form-field col-span-full">
@@ -1178,14 +1170,14 @@
         </div>
       </section>
 
-      <section id="faq" class="bg-even py-3xl md:py-5xl" aria-labelledby="faq-title">
+      <section id="faq" class="bg-even py-3xl md:py-6xl" aria-labelledby="faq-title">
         <div class="container">
           <div class="grid">
             <div class="col-span-full lg:col-span-8 lg:col-start-3">
-              <div class="text-center mb-2xl">
-                <p class="font-label fg-subtle text-uppercase mb-xs">FAQ</p>
+              <header class="text-center mb-2xl">
+                <p class="font-label fg-primary text-uppercase mb-xs">FAQ</p>
                 <h2 id="faq-title" class="mb-0">How this page works</h2>
-              </div>
+              </header>
               <div class="accordion" data-cx-accordion>
                 <details name="faq" open>
                   <summary>
@@ -1248,7 +1240,7 @@
       </section>
     </main>
 
-    <footer class="border-top py-xl">
+    <footer class="border-top border-subtle py-3xl">
       <div class="container d-flex flex-wrap align-items-center justify-content-between gap-md">
         <p class="fg-subtle mb-0">A plain HTML example for the Chassis Design System.</p>
         <ul class="bulletless d-flex gap-md mb-0">

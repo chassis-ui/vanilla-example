@@ -1,5 +1,4 @@
 # Prettier ignore
 *.css
 dist/
-vendor/
 pnpm-lock.yaml

@@ -1,10 +1,14 @@
 /**
  * Serves the page while it is edited, and reloads it when a file of src/ changes.
  *
- * A file is taken from src/ when it is there, and from dist/ otherwise: an edit of the page,
- * the styles or the scripts shows without a build, and vendor/ comes from the last build, for
- * the brand of that build. Every response has the headers of vercel.json, so a change that
- * the Content-Security-Policy refuses fails here as it fails on the site.
+ * A file is taken from src/ when it is there, and from dist/ otherwise, by the same path:
+ * /assets/css/styles.css is src/assets/css/styles.css, and /assets/css/chassis.min.css, which
+ * only the build writes, is dist/assets/css/chassis.min.css. So an edit of the page, the
+ * styles or the scripts shows without a build, and the files of the packages and of the
+ * brand come from the last build, for the brand of that build.
+ *
+ * Every response has the headers of vercel.json, so a change that the
+ * Content-Security-Policy refuses fails here as it fails on the site.
  *
  * The reload is a script of the server, loaded by a tag added to the HTML, which the policy
  * allows as a file of the site. It asks for a script that the server answers when src/
@@ -36,7 +40,9 @@ const TYPES = {
 }
 
 // The page asks for the reload with the version it was served at, and is reloaded when src/
-// has changed since
+// has changed since. It asks once the page has loaded: a script that is still loading holds
+// back the `load` event of the window, and the Chassis JavaScript starts ScrollSpy on that
+// event. A change before then is not missed, as the version tells it.
 const RELOAD = `const version = new URL(import.meta.url).searchParams.get('v')
 
 function wait() {
@@ -53,11 +59,15 @@ function wait() {
   document.head.append(script)
 }
 
-wait()
+if (document.readyState === 'complete') {
+  wait()
+} else {
+  window.addEventListener('load', wait)
+}
 `
 
-if (!existsSync(join(root, 'dist/vendor'))) {
-  console.error('Missing build: dist/vendor\nRun `pnpm build`.')
+if (!existsSync(join(root, 'dist/assets/css/chassis.min.css'))) {
+  console.error('Missing build: dist/assets/css/chassis.min.css\nRun `pnpm build`.')
   process.exit(1)
 }
 

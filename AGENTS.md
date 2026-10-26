@@ -11,12 +11,9 @@ site per brand, from the same commit. It is an example, not a package: nothing i
 published, and there are no changesets or releases.
 
 ```
-src/              # The page: index.html, theme.js, script.js, styles.css. The same for every brand
+src/              # The page: index.html, assets/css/styles.css, assets/js/{theme,script}.js. The same for every brand
 build.js          # Builds dist/ for the brand that the BRAND environment variable names
 dev.js            # Serves src/ over dist/ with the headers of vercel.json, reloads on a change
-vendor.js         # Prepares the vendor/assets submodule: checkout, Git LFS files, the subsetter
-assets.js         # What the two scripts share: the submodule path, what the example asks it for
-vendor/assets/    # Git submodule, chassis-ui/assets at a pinned commit of app/docs
 vercel.json       # Install and build commands, output folder, response headers
 .github/          # CI (lint, a build per brand) and Dependabot
 ```
@@ -27,10 +24,11 @@ Related repositories (separate git projects): `chassis-tokens`, `chassis-css`,
 ## Setup and commands
 
 - Package manager: **pnpm** (see `packageManager` in package.json). Do not use npm or yarn.
-- Node: 24 (`.nvmrc`); `engines` allows `>=22.12.0`. Git LFS has to be installed.
-- Install: `pnpm install`, then `pnpm vendor` once, and again when the submodule pin moves
-- Build: `pnpm build` for the `chassis` brand, `BRAND=sinefil pnpm build` for another. A
-  build replaces `dist/`
+- Node: 24 (`.nvmrc`); `engines` allows `>=22.12.0`.
+- Install: `pnpm install`
+- Build: `pnpm build` for the `chassis` brand, `BRAND=<brand> pnpm build` for another. A
+  build replaces `dist/`. The first build of a brand downloads its archive from the
+  chassis-assets release into `.cache/assets/`
 - Serve: `pnpm dev` at `http://localhost:4173` (`PORT` changes it), after a build. It
   serves `src/` over `dist/`, sends the headers of `vercel.json` and reloads the page when
   `src/` changes
@@ -51,18 +49,23 @@ dark, at a desktop and at a phone width. Check that the console has no message.
 - **The source is the same for every brand.** Nothing in `src/` names a brand or branches
   on one. What differs between brands comes from `@chassis-ui/tokens` and chassis-assets,
   under the same file names and paths.
-- **The assets of a brand are copied as a folder.** `build.js` copies the folder that
-  chassis-assets builds for the brand to `dist/vendor/assets/`, whole. Do not name a font
-  or an image in `build.js`, and do not copy assets file by file. What the folder holds is
-  `ASSETS_FILES` of `assets.js`, which `pnpm vendor` reads too, for the Git LFS files.
-- **The build fails on an unknown brand**, before it writes anything, and names the brands
-  that exist. Keep that check when changing `build.js`.
-- **Never edit `vendor/assets`.** It is a submodule: changes belong in the
-  `chassis-assets` repository. `pnpm vendor` writes only what chassis-assets ignores.
-  Its `README.md` and `AGENTS.md` describe the command that `build.js` runs.
+- **The assets of a brand are unpacked as a folder.** `build.js` unpacks the archive of the
+  brand from the chassis-assets release to `dist/assets/`, whole, but the folders of
+  `ASSETS_SKIP`. Do not name a font or an image in `build.js`, and do not copy assets
+  file by file.
+- **Every file but `index.html` is under `assets/`**, in a folder of its kind: `css/`,
+  `js/`, `icons/`, and the folders of the archive, which the build writes beside them. A
+  file of the archive that the build writes too fails the build. `src/` has the same
+  paths as `dist/`, as `dev.js` serves the one over the other. Do not add a `vendor/`.
+- **The archive is checked** against the SHA-256 that GitHub records for it. Keep that
+  check, and do not download an asset from anywhere but the release.
+- **The build fails on an unknown brand**, before it writes `dist/`, and names the brands
+  that exist in `@chassis-ui/tokens` and in the release. Keep that check when changing
+  `build.js`.
+- **Changes to the assets belong in the `chassis-assets` repository**, and reach this one
+  with a release.
 - **Do not depend on `@chassis-ui/docs`.** It is a tool of the documentation sites.
-  `vendor.js` is this repository's own script.
-- **Do not move the submodule pin** unless the task asks for it. The steps are under
+- **Do not move `ASSETS_VERSION`** unless the task asks for it. The steps are under
   "Assets" in `README.md`.
 - **The page loads its own files only.** The `Content-Security-Policy` of `vercel.json`
   allows the site itself, and `data:` images for Chassis CSS. Do not add an inline script,
@@ -72,7 +75,7 @@ dark, at a desktop and at a phone width. Check that the console has no message.
 - **One page, in sections.** Each section of `index.html` has an `id` and a link in the
   header navigation, which ScrollSpy follows. Do not add a second page.
 - **Components come from Chassis CSS.** Markup follows the Chassis CSS documentation, and
-  behavior is `data-cx-*` attributes read by `vendor/js/chassis.bundle.min.js`.
+  behavior is `data-cx-*` attributes read by `assets/js/chassis.bundle.min.js`.
   `script.js` holds only what the demos of the page add, and `styles.css` only what no
   Chassis class does.
 - **`theme.js` is loaded without `defer`**, so that a saved theme is set before the first
