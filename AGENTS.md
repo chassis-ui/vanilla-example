@@ -13,6 +13,7 @@ published, and there are no changesets or releases.
 ```
 src/              # The page: index.html, theme.js, script.js, styles.css. The same for every brand
 build.js          # Builds dist/ for the brand that the BRAND environment variable names
+dev.js            # Serves src/ over dist/ with the headers of vercel.json, reloads on a change
 vendor.js         # Prepares the vendor/assets submodule: checkout, Git LFS files, the subsetter
 assets.js         # What the two scripts share: the submodule path, what the example asks it for
 vendor/assets/    # Git submodule, chassis-ui/assets at a pinned commit of app/docs
@@ -30,15 +31,17 @@ Related repositories (separate git projects): `chassis-tokens`, `chassis-css`,
 - Install: `pnpm install`, then `pnpm vendor` once, and again when the submodule pin moves
 - Build: `pnpm build` for the `chassis` brand, `BRAND=sinefil pnpm build` for another. A
   build replaces `dist/`
+- Serve: `pnpm dev` at `http://localhost:4173` (`PORT` changes it), after a build. It
+  serves `src/` over `dist/`, sends the headers of `vercel.json` and reloads the page when
+  `src/` changes
 - Lint: `pnpm lint` (ESLint, then Prettier in check mode)
 - Format: `pnpm format` (Prettier, write mode)
 
 There are no tests. Before a task is done, run `pnpm lint` and build **every** brand of
 the build job in `.github/workflows/ci.yml`. After a change to the page, the styles, the
-scripts or the headers, serve `dist/` (the scripts are ES modules, which do not load from
-a `file:` address) and open each brand in a browser, in light and in dark, at a desktop
-and at a phone width. Check that the console has no message, with the headers of
-`vercel.json` on the responses.
+scripts or the headers, serve the page with `pnpm dev` (the scripts are ES modules, which
+do not load from a `file:` address) and open each brand in a browser, in light and in
+dark, at a desktop and at a phone width. Check that the console has no message.
 
 ## Rules
 

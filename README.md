@@ -46,10 +46,11 @@ pnpm vendor
 pnpm build
 ```
 
-Then serve `dist/` with a static file server and open the address it prints:
+Then serve the page and open the address it prints,
+`http://localhost:4173`:
 
 ```sh
-pnpm dlx serve dist
+pnpm dev
 ```
 
 The page loads its scripts as ES modules, which a browser does not load from a
@@ -61,6 +62,7 @@ and dialogs do not open.
 | `pnpm install` | Installs Chassis CSS, Chassis Icons, Chassis Tokens and the build tools      |
 | `pnpm vendor`  | Prepares the `vendor/assets` submodule, the source of the fonts and the logo |
 | `pnpm build`   | Writes the page to `dist/` for one brand                                     |
+| `pnpm dev`     | Serves the page from `src/` and `dist/`, and reloads it when `src/` changes  |
 | `pnpm lint`    | Checks the scripts with ESLint and the formatting with Prettier              |
 | `pnpm format`  | Formats the files with Prettier                                              |
 
@@ -91,6 +93,26 @@ does not have, it stops and prints the brands that exist:
 ```
 BRAND=acme: @chassis-ui/tokens has no brand 'acme'. It has 'chassis', 'sinefil'.
 ```
+
+## Editing the page
+
+`pnpm dev` runs `dev.js`, a server of the page for editing it. It needs a build
+first, and no package of its own.
+
+- **It serves `src/` over `dist/`.** A file of `src/` is served from there, and
+  `vendor/` from the last build. A change to `index.html`, `styles.css`,
+  `theme.js` or `script.js` needs no build. A change of the brand, the tokens,
+  Chassis CSS or the submodule does: run `pnpm build` while the server runs,
+  then reload the page.
+- **It reloads the page** when a file of `src/` changes.
+- **It sends the headers of `vercel.json`.** A `style` attribute, an inline
+  script or a file of another host fails here as it fails on the sites, with a
+  message in the console of the browser. A static file server such as
+  `pnpm dlx serve dist` sends no such header.
+
+The `PORT` environment variable changes the port, `4173` without it. The server
+adds one script to the HTML it serves, `/__dev/reload.js`, which the deployed
+sites do not have.
 
 ## What the build does
 
@@ -281,6 +303,7 @@ generates for a deployment ask for a Vercel login.
 ```
 src/              The page: index.html, theme.js, script.js and styles.css
 build.js          Builds dist/ for the brand that BRAND names
+dev.js            Serves the page while it is edited, with the headers of vercel.json
 vendor.js         Prepares the vendor/assets submodule
 assets.js         What the two scripts share about chassis-assets
 vendor/assets/    The chassis-assets submodule: fonts and logos

@@ -19,6 +19,7 @@
   "scripts": {
     "vendor": "node vendor.js",
     "build": "node build.js",
+    "dev": "node dev.js",
     "lint": "pnpm lint:eslint && pnpm lint:prettier",
     "lint:eslint": "eslint --cache --cache-location .cache/.eslintcache --report-unused-disable-directives .",
     "lint:prettier": "prettier -c --cache .",
