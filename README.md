@@ -38,8 +38,8 @@ The data is made up, and nothing that is typed leaves the page.
 A **brand** is a name, such as `chassis`, that picks a look: the colors, the
 fonts, the corner radii and the logo. The colors and the sizes are **design
 tokens**, values with names such as `primary` or `radius-md`, which
-[Chassis Tokens](https://chassis-ui.com/tokens/) keeps as Sass files, one
-folder per brand. The fonts and the logos are files of
+[website-tokens](https://github.com/chassis-ui/website-tokens) keeps as Sass
+files, one folder per brand. The fonts and the logos are files of
 [chassis-assets](https://github.com/chassis-ui/assets), one archive per brand.
 
 `pnpm build` reads the brand from the `BRAND` environment variable and writes
@@ -52,8 +52,8 @@ From                          How        To dist/
 src/index.html, src/assets/   copied     index.html, assets/css/styles.css,
                                          assets/js/theme.js and script.js
 @chassis-ui/css, Sass source  compiled   assets/css/chassis.min.css
-  with the tokens of the
-  brand in @chassis-ui/tokens
+  with the tokens of the brand
+  in @chassis-ui/website-tokens
 @chassis-ui/css, JavaScript   copied     assets/js/chassis.bundle.min.js
 @chassis-ui/icons             copied     assets/icons/
 chassis-assets, the archive   unpacked   assets/fonts/, assets/images/, ...
@@ -100,7 +100,7 @@ and dialogs do not open.
 
 | Command        | What it does                                                                |
 | -------------- | --------------------------------------------------------------------------- |
-| `pnpm install` | Installs Chassis CSS, Chassis Icons, Chassis Tokens and the build tools     |
+| `pnpm install` | Installs Chassis CSS, Chassis Icons, the design tokens and the build tools  |
 | `pnpm build`   | Writes the page to `dist/` for one brand                                    |
 | `pnpm dev`     | Serves the page from `src/` and `dist/`, and reloads it when `src/` changes |
 | `pnpm lint`    | Checks the scripts with ESLint and the formatting with Prettier             |
@@ -121,7 +121,8 @@ every brand, so the page links the same files whatever the brand.
 
 A brand has to exist under the same name in two places:
 
-- `@chassis-ui/tokens`, as the folder `dist/web/docs/<brand>/` of the package
+- `@chassis-ui/website-tokens`, as the folder `dist/web/docs/<brand>/` of the
+  package
 - chassis-assets, as an archive of the release that the build takes,
   `chassis-assets-web-docs-<brand>-<version>.zip`
 
@@ -129,7 +130,7 @@ The build checks both before it writes `dist/`. With a name that one of them
 does not have, it stops and prints the brands that exist:
 
 ```
-BRAND=acme: @chassis-ui/tokens has no brand 'acme'. It has 'chassis', …
+BRAND=acme: @chassis-ui/website-tokens has no brand 'acme'. It has 'chassis', …
 ```
 
 ## Editing the page
@@ -194,7 +195,7 @@ does it in two steps:
    [importer](https://sass-lang.com/documentation/js-api/interfaces/fileimporter/),
    a function that tells Sass which file to load for a name. It answers
    `chassis-tokens` with `dist/web/docs/<brand>/main.scss` of
-   `@chassis-ui/tokens`.
+   `@chassis-ui/website-tokens`.
 2. **PostCSS.** The plugins of `@chassis-ui/css/postcss` add the `--cx-` prefix
    to the custom properties, and Autoprefixer adds the vendor prefixes for the
    browser list of Chassis CSS.
@@ -240,12 +241,6 @@ It loads three scripts, all files of the site:
   [ScrollSpy](https://chassis-ui.com/css/docs/components/scrollspy/) and
   [Drawer](https://chassis-ui.com/css/docs/components/drawer/).
 
-The page works around one bug of Chassis CSS: its two `.table-responsive`
-wrappers have the `position-relative` class, without which a table widens the
-page on a phone
-([chassis-ui/css#79](https://github.com/chassis-ui/css/issues/79)). Remove the
-class once a version of `@chassis-ui/css` with the fix is installed.
-
 ### Assets
 
 The fonts and the logos are in
@@ -284,7 +279,7 @@ every brand.
 ## Adding a brand
 
 Nothing in this repository lists the brands, so a brand that exists in
-`@chassis-ui/tokens` and in chassis-assets builds with its name:
+`@chassis-ui/website-tokens` and in chassis-assets builds with its name:
 
 ```sh
 BRAND=<brand> pnpm build
@@ -292,7 +287,8 @@ BRAND=<brand> pnpm build
 
 When the brand is new in one of the two, update that side first:
 
-1. For the tokens, install a version of `@chassis-ui/tokens` that has the brand.
+1. For the tokens, install a version of `@chassis-ui/website-tokens` that has
+   the brand.
 2. For the fonts and the logo, move to a release of chassis-assets that has
    the brand, as [Assets](#assets) describes.
 
@@ -304,9 +300,9 @@ describes.
 
 What the build, the server or the browser may print, and what to do:
 
-- **`BRAND=acme: @chassis-ui/tokens has no brand 'acme'`**, or **chassis-assets
-  … has no brand**. Check the spelling of `BRAND`. For a new brand, see
-  [Adding a brand](#adding-a-brand).
+- **`BRAND=acme: @chassis-ui/website-tokens has no brand 'acme'`**, or
+  **chassis-assets … has no brand**. Check the spelling of `BRAND`. For a new
+  brand, see [Adding a brand](#adding-a-brand).
 - **`https://api.github.com/…: HTTP 403`**. The GitHub API answers 60 requests
   an hour without a token
   ([rate limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api)).

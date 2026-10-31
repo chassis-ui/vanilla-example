@@ -49,7 +49,7 @@ const dist = join(root, 'dist')
 const assets = join(dist, 'assets')
 const modules = join(root, 'node_modules')
 const cssDir = join(modules, '@chassis-ui/css')
-const tokensDir = join(modules, '@chassis-ui/tokens/dist/web/docs')
+const tokensDir = join(modules, '@chassis-ui/website-tokens/dist/web/docs')
 const iconsDir = join(modules, '@chassis-ui/icons/icons')
 const assetsCache = join(root, '.cache/assets', `v${ASSETS_VERSION}`)
 
@@ -58,14 +58,14 @@ function fail(message) {
   process.exit(1)
 }
 
-// A brand has the same name here, in @chassis-ui/tokens and in chassis-assets
+// A brand has the same name here, in @chassis-ui/website-tokens and in chassis-assets
 const brand = process.env.BRAND?.trim() || DEFAULT_BRAND
 
 function list(names) {
   return names.map((name) => `'${name}'`).join(', ')
 }
 
-// The brands of @chassis-ui/tokens: a folder each, with a `main.scss`
+// The brands of @chassis-ui/website-tokens: a folder each, with a `main.scss`
 function tokensBrands() {
   if (!existsSync(tokensDir)) {
     fail(`Missing source: ${tokensDir}\nRun \`pnpm install\`.`)
@@ -121,7 +121,9 @@ function checkBrand(archives) {
   const assets = Object.keys(archives)
 
   if (!tokens.includes(brand)) {
-    fail(`BRAND=${brand}: @chassis-ui/tokens has no brand '${brand}'. It has ${list(tokens)}.`)
+    fail(
+      `BRAND=${brand}: @chassis-ui/website-tokens has no brand '${brand}'. It has ${list(tokens)}.`
+    )
   }
 
   if (!assets.includes(brand)) {

@@ -18,7 +18,7 @@ vercel.json       # Install and build commands, output folder, response headers
 .github/          # CI (lint, a build per brand) and Dependabot
 ```
 
-Related repositories (separate git projects): `chassis-tokens`, `chassis-css`,
+Related repositories (separate git projects): `chassis-website-tokens`, `chassis-css`,
 `chassis-icons`, `chassis-assets`, `chassis-website`.
 
 ## Setup and commands
@@ -47,8 +47,8 @@ dark, at a desktop and at a phone width. Check that the console has no message.
   The output is `dist/` itself. Do not add a list of brands to this repository, a
   `dist/<brand>/` folder or a page that redirects to a brand.
 - **The source is the same for every brand.** Nothing in `src/` names a brand or branches
-  on one. What differs between brands comes from `@chassis-ui/tokens` and chassis-assets,
-  under the same file names and paths.
+  on one. What differs between brands comes from `@chassis-ui/website-tokens` and
+  chassis-assets, under the same file names and paths.
 - **The assets of a brand are unpacked as a folder.** `build.js` unpacks the archive of the
   brand from the chassis-assets release to `dist/assets/`, whole, but the folders of
   `ASSETS_SKIP`. Do not name a font or an image in `build.js`, and do not copy assets
@@ -60,8 +60,8 @@ dark, at a desktop and at a phone width. Check that the console has no message.
 - **The archive is checked** against the SHA-256 that GitHub records for it. Keep that
   check, and do not download an asset from anywhere but the release.
 - **The build fails on an unknown brand**, before it writes `dist/`, and names the brands
-  that exist in `@chassis-ui/tokens` and in the release. Keep that check when changing
-  `build.js`.
+  that exist in `@chassis-ui/website-tokens` and in the release. Keep that check when
+  changing `build.js`.
 - **Changes to the assets belong in the `chassis-assets` repository**, and reach this one
   with a release.
 - **Do not depend on `@chassis-ui/docs`.** It is a tool of the documentation sites.
