@@ -18,8 +18,8 @@ vercel.json       # Install and build commands, output folder, response headers
 .github/          # CI (lint, a build per brand) and Dependabot
 ```
 
-Related repositories (separate git projects): `chassis-website-tokens`, `chassis-css`,
-`chassis-icons`, `chassis-assets`, `chassis-website`.
+Related repositories (separate git projects, under `chassis-ui` on GitHub): `website-tokens`,
+`css`, `icons`, `website-assets`, `website`.
 
 ## Setup and commands
 
@@ -28,7 +28,7 @@ Related repositories (separate git projects): `chassis-website-tokens`, `chassis
 - Install: `pnpm install`
 - Build: `pnpm build` for the `chassis` brand, `BRAND=<brand> pnpm build` for another. A
   build replaces `dist/`. The first build of a brand downloads its archive from the
-  chassis-assets release into `.cache/assets/`
+  website-assets release into `.cache/assets/`
 - Serve: `pnpm dev` at `http://localhost:4173` (`PORT` changes it), after a build. It
   serves `src/` over `dist/`, sends the headers of `vercel.json` and reloads the page when
   `src/` changes
@@ -48,9 +48,9 @@ dark, at a desktop and at a phone width. Check that the console has no message.
   `dist/<brand>/` folder or a page that redirects to a brand.
 - **The source is the same for every brand.** Nothing in `src/` names a brand or branches
   on one. What differs between brands comes from `@chassis-ui/website-tokens` and
-  chassis-assets, under the same file names and paths.
+  website-assets, under the same file names and paths.
 - **The assets of a brand are unpacked as a folder.** `build.js` unpacks the archive of the
-  brand from the chassis-assets release to `dist/assets/`, whole, but the folders of
+  brand from the website-assets release to `dist/assets/`, whole, but the folders of
   `ASSETS_SKIP`. Do not name a font or an image in `build.js`, and do not copy assets
   file by file.
 - **Every file but `index.html` is under `assets/`**, in a folder of its kind: `css/`,
@@ -62,7 +62,7 @@ dark, at a desktop and at a phone width. Check that the console has no message.
 - **The build fails on an unknown brand**, before it writes `dist/`, and names the brands
   that exist in `@chassis-ui/website-tokens` and in the release. Keep that check when
   changing `build.js`.
-- **Changes to the assets belong in the `chassis-assets` repository**, and reach this one
+- **Changes to the assets belong in the `website-assets` repository**, and reach this one
   with a release.
 - **Do not depend on `@chassis-ui/docs`.** It is a tool of the documentation sites.
 - **Do not move `ASSETS_VERSION`** unless the task asks for it. The steps are under
@@ -86,6 +86,9 @@ dark, at a desktop and at a phone width. Check that the console has no message.
   CSS files are not formatted by Prettier.
 - Keep `README.md` true: it documents the commands, the brand check and the deployment.
   Every path, command and option in it must exist as written.
+- **Name a sibling by its GitHub repository**, as `chassis-ui/css`, or `css` where the
+  owner is clear, never by a local folder name or a relative path. Folders differ per
+  contributor.
 
 ## Cautions
 

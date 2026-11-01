@@ -73,7 +73,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       # The token raises the limit of the GitHub API, which the build asks for the archives of
-      # the chassis-assets release
+      # the website-assets release
       - name: Build
         run: pnpm build
         env:

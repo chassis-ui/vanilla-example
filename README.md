@@ -40,7 +40,7 @@ fonts, the corner radii and the logo. The colors and the sizes are **design
 tokens**, values with names such as `primary` or `radius-md`, which
 [website-tokens](https://github.com/chassis-ui/website-tokens) keeps as Sass
 files, one folder per brand. The fonts and the logos are files of
-[chassis-assets](https://github.com/chassis-ui/assets), one archive per brand.
+[website-assets](https://github.com/chassis-ui/website-assets), one archive per brand.
 
 `pnpm build` reads the brand from the `BRAND` environment variable and writes
 the site to `dist/`, from four sources:
@@ -56,7 +56,7 @@ src/index.html, src/assets/   copied     index.html, assets/css/styles.css,
   in @chassis-ui/website-tokens
 @chassis-ui/css, JavaScript   copied     assets/js/chassis.bundle.min.js
 @chassis-ui/icons             copied     assets/icons/
-chassis-assets, the archive   unpacked   assets/fonts/, assets/images/, ...
+website-assets, the archive   unpacked   assets/fonts/, assets/images/, ...
   of the brand in a release
 ```
 
@@ -123,8 +123,8 @@ A brand has to exist under the same name in two places:
 
 - `@chassis-ui/website-tokens`, as the folder `dist/web/docs/<brand>/` of the
   package
-- chassis-assets, as an archive of the release that the build takes,
-  `chassis-assets-web-docs-<brand>-<version>.zip`
+- website-assets, as an archive of the release that the build takes,
+  `chassis-website-assets-web-docs-<brand>-<version>.zip`
 
 The build checks both before it writes `dist/`. With a name that one of them
 does not have, it stops and prints the brands that exist:
@@ -141,7 +141,7 @@ first, and no package of its own.
 - **It serves `src/` over `dist/`.** A file of `src/` is served from there, and
   the files of the packages and of the brand from the last build. A change to
   `index.html`, `styles.css`, `theme.js` or `script.js` needs no build. A change
-  of the brand, the tokens, Chassis CSS or the release of chassis-assets does:
+  of the brand, the tokens, Chassis CSS or the release of website-assets does:
   run `pnpm build` while the server runs, then reload the page.
 - **It reloads the page** when a file of `src/` changes.
 - **It sends the headers of `vercel.json`.** A `style` attribute, an inline
@@ -173,10 +173,10 @@ so that every file but `index.html` is under `dist/assets/`:
 | `assets/css/`    | `chassis.min.css`, compiled from the Sass source with the tokens of the brand | `@chassis-ui/css`   |
 | `assets/js/`     | `chassis.bundle.min.js`, the Chassis JavaScript as one ES module, and its map | `@chassis-ui/css`   |
 | `assets/icons/`  | The icon font stylesheet and its font files                                   | `@chassis-ui/icons` |
-| `assets/fonts/`  | The fonts of the brand, with `fonts.css` and their licenses                   | chassis-assets      |
-| `assets/images/` | The logos, the favicons and the icons of a web app                            | chassis-assets      |
+| `assets/fonts/`  | The fonts of the brand, with `fonts.css` and their licenses                   | website-assets      |
+| `assets/images/` | The logos, the favicons and the icons of a web app                            | website-assets      |
 
-The archive of chassis-assets also adds `icons/cx-sprite.svg` and
+The archive of website-assets also adds `icons/cx-sprite.svg` and
 `other/manifest.json`, which the page does not link.
 
 ### The CSS of a brand
@@ -212,7 +212,7 @@ runs.
 
 The page loads two stylesheets of its own beside those of the packages:
 
-- `assets/fonts/fonts.css`, from chassis-assets, declares the fonts of the
+- `assets/fonts/fonts.css`, from website-assets, declares the fonts of the
   brand under the names that the tokens use.
 - `assets/css/styles.css` holds what no Chassis class does, such as the three
   columns of the header and the logo of each theme. Its rules are in the
@@ -244,16 +244,16 @@ It loads three scripts, all files of the site:
 ### Assets
 
 The fonts and the logos are in
-[chassis-assets](https://github.com/chassis-ui/assets), which is not on npm. Each
-[release of chassis-assets](https://github.com/chassis-ui/assets/releases) has
+[website-assets](https://github.com/chassis-ui/website-assets), which is not on npm. Each
+[release of website-assets](https://github.com/chassis-ui/website-assets/releases) has
 an archive per platform, app and brand. The build takes the web archive of the
-`docs` app for the brand, `chassis-assets-web-docs-<brand>-<version>.zip`, from
+`docs` app for the brand, `chassis-website-assets-web-docs-<brand>-<version>.zip`, from
 the release that `ASSETS_VERSION` of `build.js` names.
 
 `build.js`:
 
 1. asks the GitHub API for the archives of the release, which give the brands
-   that chassis-assets has, and checks the brand against them
+   that website-assets has, and checks the brand against them
 2. downloads the archive of the brand, and checks it against the SHA-256 that
    GitHub records for it
 3. unpacks it to `dist/assets/` as a whole, but the folders of `ASSETS_SKIP`:
@@ -261,9 +261,9 @@ the release that `ASSETS_VERSION` of `build.js` names.
    goes beside the files that the build writes there, and a file of the archive
    with the path of one of them fails the build
 
-That archive is how a project takes its assets from chassis-assets: every brand
+That archive is how a project takes its assets from website-assets: every brand
 has the same file names and the same paths in it, so the build names no font
-and no image, and a file that chassis-assets adds or renames needs no change in
+and no image, and a file that website-assets adds or renames needs no change in
 `build.js`. The folder holds more than the page links, such as the fonts of each
 weight beside the variable fonts, and the icons of a web app.
 
@@ -272,14 +272,14 @@ build downloads nothing when they are there. A `GITHUB_TOKEN` environment
 variable raises the limit of the GitHub API, 60 requests an hour without one:
 CI sets it.
 
-To move to another release of chassis-assets, change `ASSETS_VERSION` in
+To move to another release of website-assets, change `ASSETS_VERSION` in
 `build.js`, update the page for the files that the release renames, and build
 every brand.
 
 ## Adding a brand
 
 Nothing in this repository lists the brands, so a brand that exists in
-`@chassis-ui/website-tokens` and in chassis-assets builds with its name:
+`@chassis-ui/website-tokens` and in website-assets builds with its name:
 
 ```sh
 BRAND=<brand> pnpm build
@@ -289,7 +289,7 @@ When the brand is new in one of the two, update that side first:
 
 1. For the tokens, install a version of `@chassis-ui/website-tokens` that has
    the brand.
-2. For the fonts and the logo, move to a release of chassis-assets that has
+2. For the fonts and the logo, move to a release of website-assets that has
    the brand, as [Assets](#assets) describes.
 
 Then add the brand to the `brand` list of the build job in
@@ -301,7 +301,7 @@ describes.
 What the build, the server or the browser may print, and what to do:
 
 - **`BRAND=acme: @chassis-ui/website-tokens has no brand 'acme'`**, or
-  **chassis-assets … has no brand**. Check the spelling of `BRAND`. For a new
+  **website-assets … has no brand**. Check the spelling of `BRAND`. For a new
   brand, see [Adding a brand](#adding-a-brand).
 - **`https://api.github.com/…: HTTP 403`**. The GitHub API answers 60 requests
   an hour without a token
@@ -311,14 +311,14 @@ What the build, the server or the browser may print, and what to do:
 - **`…: fetch failed`** on a first build. The build downloads the list of the
   release and the archive of the brand from GitHub once, then keeps them in
   `.cache/assets/`. Build once with a connection.
-- **`chassis-assets-web-docs-….zip: the SHA-256 is …, and the release has …`**.
+- **`chassis-website-assets-web-docs-….zip: the SHA-256 is …, and the release has …`**.
   The archive in `.cache/assets/` is damaged. Remove that folder and build
   again. If a fresh download fails too, the release has changed: tell the
-  maintainers of chassis-assets.
+  maintainers of website-assets.
 - **`The archive has <path>, which the build writes too.`** A release of
-  chassis-assets has a file at a path that the build writes, under
+  website-assets has a file at a path that the build writes, under
   `dist/assets/css/`, `js/` or `icons/`. Rename the file of the build, or ask
-  the maintainers of chassis-assets about theirs.
+  the maintainers of website-assets about theirs.
 - **`Missing build: dist/assets/css/chassis.min.css`** from `pnpm dev`. Run
   `pnpm build` first.
 - **`Port 4173 is in use`** from `pnpm dev`. Another server runs on that port,
@@ -376,7 +376,7 @@ Every project has the same settings on Vercel, except for the value of `BRAND`:
 | Environment Variables     | `BRAND`, the name of the brand                            |
 | Node.js Version           | 24.x                                                      |
 
-The assets need no setting. chassis-assets is a public repository, and the
+The assets need no setting. website-assets is a public repository, and the
 build downloads the archive of the brand from its release while the site is
 built.
 
@@ -410,7 +410,7 @@ vercel.json       The build and the headers of the deployed sites
 AGENTS.md         The rules of this repository, for AI coding agents and people
 ```
 
-The build writes the site to `dist/`, and keeps the downloads of chassis-assets
+The build writes the site to `dist/`, and keeps the downloads of website-assets
 in `.cache/assets/`. Neither is committed.
 
 ## License
