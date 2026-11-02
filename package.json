@@ -27,18 +27,18 @@
   "devDependencies": {
     "@chassis-ui/css": "^0.14.0",
     "@chassis-ui/icons": "^0.3.1",
-    "@chassis-ui/website-tokens": "^0.1.0",
+    "@chassis-ui/website-tokens": "^0.2.0",
     "@eslint/js": "^10.0.1",
-    "autoprefixer": "^10.6.1",
+    "autoprefixer": "^10.6.2",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.7",
     "fflate": "^0.8.3",
     "globals": "^17.13.0",
-    "postcss": "^8.5.31",
+    "postcss": "^8.5.32",
     "postcss-prefix-custom-properties": "^0.1.0",
     "prettier": "^3.9.10",
-    "sass": "^1.106.1"
+    "sass": "^1.107.0"
   },
   "packageManager": "pnpm@10.33.2+sha512.a90faf6feeab71ad6c6e57f94e0fe1a12f5dcc22cd754db40ae9593eb6a3e0b6b12e3540218bb37ae083404b1f2ce6db2a4121e979829b4aff94b99f49da1cf8"
 }
