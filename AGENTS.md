@@ -15,7 +15,7 @@ src/              # The page: index.html, assets/css/styles.css, assets/js/{them
 build.js          # Builds dist/ for the brand that the BRAND environment variable names
 dev.js            # Serves src/ over dist/ with the headers of vercel.json, reloads on a change
 vercel.json       # Install and build commands, output folder, response headers
-.github/          # CI (lint, a build per brand) and Dependabot
+.github/          # CI (lint, a build per brand), the assets version and Dependabot
 ```
 
 Related repositories (separate git projects, under `chassis-ui` on GitHub): `website-tokens`,

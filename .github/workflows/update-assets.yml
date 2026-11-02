@@ -1,0 +1,52 @@
+name: Update assets
+
+# Each week, moves ASSETS_VERSION of build.js to the latest release of website-assets and opens a
+# pull request, whose CI builds every brand. Dependabot moves @chassis-ui/website-tokens. The
+# repository has to allow Actions to create pull requests, and CI of a pull request from this
+# token starts when someone closes and reopens it.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Move the version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          assets="$(gh release view --repo chassis-ui/website-assets --json tagName --jq .tagName)"
+          assets="${assets#v}"
+          sed -i "s/^const ASSETS_VERSION = '.*'/const ASSETS_VERSION = '$assets'/" build.js
+          echo "assets=$assets" >>"$GITHUB_OUTPUT"
+
+      - name: Open a pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ASSETS: ${{ steps.version.outputs.assets }}
+        run: |
+          if git diff --quiet build.js; then
+            echo "Already on the latest version."
+            exit 0
+          fi
+          branch="update-assets/$ASSETS"
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            echo "$branch exists already."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git commit -am "chore: website-assets $ASSETS"
+          git push origin "$branch"
+          gh pr create --fill --body "Moves \`ASSETS_VERSION\` of \`build.js\` to website-assets $ASSETS. Check each brand before merging."

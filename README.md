@@ -274,7 +274,8 @@ CI sets it.
 
 To move to another release of website-assets, change `ASSETS_VERSION` in
 `build.js`, update the page for the files that the release renames, and build
-every brand.
+every brand. The `Update assets` workflow opens a pull request with the new version
+each Monday, and Dependabot does the same for `@chassis-ui/website-tokens`.
 
 ## Adding a brand
 
@@ -406,7 +407,7 @@ src/              The page: index.html, and its styles and scripts in assets/
 build.js          Builds dist/ for the brand that BRAND names
 dev.js            Serves the page while it is edited, with the headers of vercel.json
 vercel.json       The build and the headers of the deployed sites
-.github/          The CI workflow and the Dependabot configuration
+.github/          The workflows of CI and of the assets version, and Dependabot
 AGENTS.md         The rules of this repository, for AI coding agents and people
 ```
 
