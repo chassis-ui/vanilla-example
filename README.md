@@ -124,7 +124,7 @@ A brand has to exist under the same name in two places:
 - `@chassis-ui/website-tokens`, as the folder `dist/web/docs/<brand>/` of the
   package
 - website-assets, as an archive of the release that the build takes,
-  `chassis-website-assets-web-docs-<brand>-<version>.zip`
+  `website-assets-web-docs-<brand>-<version>.zip`
 
 The build checks both before it writes `dist/`. With a name that one of them
 does not have, it stops and prints the brands that exist:
@@ -247,7 +247,7 @@ The fonts and the logos are in
 [website-assets](https://github.com/chassis-ui/website-assets), which is not on npm. Each
 [release of website-assets](https://github.com/chassis-ui/website-assets/releases) has
 an archive per platform, app and brand. The build takes the web archive of the
-`docs` app for the brand, `chassis-website-assets-web-docs-<brand>-<version>.zip`, from
+`docs` app for the brand, `website-assets-web-docs-<brand>-<version>.zip`, from
 the release that `ASSETS_VERSION` of `build.js` names.
 
 `build.js`:

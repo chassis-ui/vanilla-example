@@ -35,7 +35,7 @@ import * as sass from 'sass'
 
 const DEFAULT_BRAND = 'chassis'
 // The release of website-assets that the fonts and the logos come from
-const ASSETS_VERSION = '0.2.1'
+const ASSETS_VERSION = '0.5.0'
 const ASSETS_RELEASE = `https://api.github.com/repos/chassis-ui/website-assets/releases/tags/v${ASSETS_VERSION}`
 // The folders of an archive that the page has no use for: the design exports of the docs app,
 // most of its size
@@ -77,7 +77,7 @@ function tokensBrands() {
 }
 
 // The archives of the release, one per platform, app and brand. The page takes the web
-// archive of the `docs` app: chassis-website-assets-web-docs-<brand>-<version>.zip. Returns, by
+// archive of the `docs` app: website-assets-web-docs-<brand>-<version>.zip. Returns, by
 // brand, its name, its download address and its SHA-256, from .cache/assets/ when an
 // earlier build asked GitHub for them already.
 async function assetsArchives() {
@@ -100,7 +100,7 @@ async function assetsArchives() {
     fail(`${ASSETS_RELEASE}: HTTP ${response.status}`)
   }
 
-  const prefix = 'chassis-website-assets-web-docs-'
+  const prefix = 'website-assets-web-docs-'
   const suffix = `-${ASSETS_VERSION}.zip`
   const archives = {}
 
