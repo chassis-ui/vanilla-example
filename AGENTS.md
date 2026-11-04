@@ -19,7 +19,7 @@ vercel.json       # Install and build commands, output folder, response headers
 ```
 
 Related repositories (separate git projects, under `chassis-ui` on GitHub): `website-tokens`,
-`css`, `icons`, `website-assets`, `website`.
+`css`, `website-icons`, `website-assets`, `website`.
 
 ## Setup and commands
 

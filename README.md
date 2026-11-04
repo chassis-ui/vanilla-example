@@ -55,7 +55,7 @@ src/index.html, src/assets/   copied     index.html, assets/css/styles.css,
   with the tokens of the brand
   in @chassis-ui/website-tokens
 @chassis-ui/css, JavaScript   copied     assets/js/chassis.bundle.min.js
-@chassis-ui/icons             copied     assets/icons/
+@chassis-ui/website-icons     copied     assets/icons/
 website-assets, the archive   unpacked   assets/fonts/, assets/images/, ...
   of the brand in a release
 ```
@@ -168,13 +168,13 @@ stylesheet and scripts in `assets/css/` and `assets/js/`. `build.js` copies it
 to `dist/`, and writes the files of the packages and of the brand beside them,
 so that every file but `index.html` is under `dist/assets/`:
 
-| Folder           | Files                                                                         | From                |
-| ---------------- | ----------------------------------------------------------------------------- | ------------------- |
-| `assets/css/`    | `chassis.min.css`, compiled from the Sass source with the tokens of the brand | `@chassis-ui/css`   |
-| `assets/js/`     | `chassis.bundle.min.js`, the Chassis JavaScript as one ES module, and its map | `@chassis-ui/css`   |
-| `assets/icons/`  | The icon font stylesheet and its font files                                   | `@chassis-ui/icons` |
-| `assets/fonts/`  | The fonts of the brand, with `fonts.css` and their licenses                   | website-assets      |
-| `assets/images/` | The logos, the favicons and the icons of a web app                            | website-assets      |
+| Folder           | Files                                                                         | From                        |
+| ---------------- | ----------------------------------------------------------------------------- | --------------------------- |
+| `assets/css/`    | `chassis.min.css`, compiled from the Sass source with the tokens of the brand | `@chassis-ui/css`           |
+| `assets/js/`     | `chassis.bundle.min.js`, the Chassis JavaScript as one ES module, and its map | `@chassis-ui/css`           |
+| `assets/icons/`  | The icon font stylesheet and its font files                                   | `@chassis-ui/website-icons` |
+| `assets/fonts/`  | The fonts of the brand, with `fonts.css` and their licenses                   | website-assets              |
+| `assets/images/` | The logos, the favicons and the icons of a web app                            | website-assets              |
 
 The archive of website-assets also adds `icons/cx-sprite.svg` and
 `other/manifest.json`, which the page does not link.

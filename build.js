@@ -6,7 +6,8 @@
  * - everything in src/, the same files for every brand: the page's own css/ and js/
  * - css/: Chassis CSS, compiled from its Sass source with the design tokens of the brand
  * - js/: the Chassis JavaScript bundle, with the libraries its plugins use
- * - icons/: the Chassis Icons font stylesheet and the font files it references
+ * - icons/: the Chassis Icons font stylesheet of @chassis-ui/website-icons and the font files
+ *   it references
  * - the archive of the brand from a release of website-assets, as a whole: the fonts with
  *   their stylesheet and licenses in fonts/, the logos in images/, and the rest of its
  *   folders. A file of the archive that the build writes too fails the build
@@ -50,7 +51,7 @@ const assets = join(dist, 'assets')
 const modules = join(root, 'node_modules')
 const cssDir = join(modules, '@chassis-ui/css')
 const tokensDir = join(modules, '@chassis-ui/website-tokens/dist/web/docs')
-const iconsDir = join(modules, '@chassis-ui/icons/icons')
+const iconsDir = join(modules, '@chassis-ui/website-icons/dist/web')
 const assetsCache = join(root, '.cache/assets', `v${ASSETS_VERSION}`)
 
 function fail(message) {
