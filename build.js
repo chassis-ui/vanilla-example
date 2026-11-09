@@ -36,7 +36,7 @@ import * as sass from 'sass'
 
 const DEFAULT_BRAND = 'chassis'
 // The release of website-assets that the fonts and the logos come from
-const ASSETS_VERSION = '0.5.0'
+const ASSETS_VERSION = '0.5.1'
 const ASSETS_RELEASE = `https://api.github.com/repos/chassis-ui/website-assets/releases/tags/v${ASSETS_VERSION}`
 // The folders of an archive that the page has no use for: the design exports of the docs app,
 // most of its size
